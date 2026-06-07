@@ -9,7 +9,7 @@ output "cluster_name" {
 }
  
 output "region" {
-  description = "AWS region."
+  description = "AWS deployment region."
   value       = var.region
 }
  
