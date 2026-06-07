@@ -33,11 +33,11 @@ Outbound internet access from the private subnets goes through a single NAT Gate
 
 All seven services run as Deployments with ClusterIP Services in the `retail-app` namespace. They talk to each other using short DNS names like `http://catalog`, `http://orders`, and so on. The UI is the only service exposed outside the cluster.
 
-The images are all from the AWS Containers public ECR gallery at version 1.6.1, except for RabbitMQ (`rabbitmq:3-management`) and Redis (`redis:7`) which are standard Docker Hub images.
+The images are all from the AWS Containers public ECR gallery at version 1.6.1, except for RabbitMQ (`rabbitmq:3.13-alpine`) and Redis (`redis:7-alpine`) which are standard Docker Hub images.
 
-The UI calls catalog, orders, carts, and checkout. Checkout depends on RabbitMQ and Redis. Catalog, orders, and carts each connect to their respective data stores.
+The UI calls catalog, orders, carts, and checkout. Checkout connects to Redis (for session state) and calls orders. Catalog, orders, and carts each connect to their respective data stores.
 
-Every application container is configured with a 100m CPU / 256Mi memory request and a 500m CPU / 512Mi memory limit.
+The application containers (ui, catalog, orders, carts, checkout, rabbitmq) are each configured with a 100m CPU / 256Mi memory request and 500m CPU / 512Mi memory limit. Redis is lighter at 50m CPU / 128Mi request and 250m CPU / 256Mi limit.
 
 ---
 
@@ -107,7 +107,7 @@ There's an S3 bucket (`bedrock-assets-alt-soe-025-5437`) with all public access 
 
 The GitHub Actions workflow uses OIDC to assume an AWS role, so there are no long-lived credentials in the repo. Any PR that touches `terraform/**` runs `terraform plan` and posts the output as a comment. Merging to `main` runs `terraform apply` automatically.
 
-The role ARN is stored as the `AWS_ROLE_ARN` repository secret, set from `terraform output github_actions_role_arn`.
+This uses its own OIDC provider (`aws_iam_openid_connect_provider.github`) pointed at `token.actions.githubusercontent.com`, separate from the EKS cluster OIDC provider. The role is `bedrock-github-actions` with `AdministratorAccess`. The role ARN is stored as the `AWS_ROLE_ARN` repository secret, set from `terraform output github_actions_role_arn`.
 
 ---
 

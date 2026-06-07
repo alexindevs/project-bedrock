@@ -277,9 +277,4 @@ aws lambda invoke \
 
 ## Tear Down
 
-```bash
-cd terraform
-terraform destroy
-```
-
-RDS and EKS take around 10-15 minutes each. NAT Gateways take about 5 minutes. The S3 tfstate bucket (`bedrock-tfstate-alt-soe-025-5437`) is not managed by Terraform, so delete it manually if you're fully decommissioning.
+See the Tear Down section in [RUNBOOK.md](RUNBOOK.md) for the full procedure. Running `terraform destroy` alone is not sufficient.

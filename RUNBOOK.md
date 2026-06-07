@@ -179,9 +179,63 @@ For infrastructure changes, open a PR against `terraform/**`. The workflow will 
 
 ## Tear Down
 
+Not everything was created by Terraform, so `terraform destroy` alone will leave orphaned AWS resources. The order matters here - the Load Balancer Controller needs to be running when you delete the ingress so it can clean up the ALB and its associated target groups and security groups. If the ALB is still around when Terraform tries to delete the VPC, it will fail.
+
+**Step 1 - Delete the ingress.** This tells the LBC to deprovision the ALB.
+
+```bash
+kubectl delete -f k8s/ingress.yaml
+```
+
+Wait until the ALB is gone before continuing. You can check in the AWS Console under EC2 > Load Balancers, or watch the ingress until the ADDRESS clears:
+
+```bash
+kubectl get ingress retail-ui -n retail-app -w
+```
+
+**Step 2 - Uninstall the Helm releases.**
+
+```bash
+helm uninstall retail-store -n retail-app
+helm uninstall external-secrets -n external-secrets
+helm uninstall aws-load-balancer-controller -n kube-system
+```
+
+**Step 3 - Delete the remaining kubectl-applied resources.**
+
+```bash
+kubectl delete -f k8s/external-secrets/externalsecrets.yaml
+kubectl delete -f k8s/external-secrets/secretstore.yaml
+kubectl delete -f k8s/external-secrets/sa.yaml
+kubectl delete -f k8s/lb-controller/sa.yaml
+kubectl delete -f k8s/rbac/dev-view-binding.yaml
+```
+
+**Step 4 - Terraform destroy.** This removes everything Terraform provisioned: EKS, RDS, DynamoDB, VPC, IAM roles, Secrets Manager secrets, S3 assets bucket, Lambda, and the OIDC provider.
+
 ```bash
 cd terraform
 terraform destroy
 ```
 
-RDS and EKS each take around 10-15 minutes to delete, and NAT Gateways take about 5 minutes. The tfstate S3 bucket is not managed by Terraform, so delete it manually if you're fully decommissioning the environment.
+RDS and EKS each take around 10-15 minutes. NAT Gateways take about 5 minutes.
+
+**Step 5 - Manual cleanup.** Two things exist outside Terraform state:
+
+The tfstate bucket was created manually before Terraform was initialized. Delete it once you no longer need the state:
+
+```bash
+aws s3 rm s3://bedrock-tfstate-alt-soe-025-5437 --recursive
+aws s3api delete-bucket --bucket bedrock-tfstate-alt-soe-025-5437 --region us-east-1
+```
+
+If an access key was created for `bedrock-dev-view`, deactivate and delete it:
+
+```bash
+# list keys to get the key id
+aws iam list-access-keys --user-name bedrock-dev-view
+
+aws iam delete-access-key \
+  --user-name bedrock-dev-view \
+  --access-key-id <key-id>
+```
