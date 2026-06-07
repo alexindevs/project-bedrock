@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: carts
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    eks.amazonaws.com/role-arn: "{{ index .Values.carts.serviceAccount.annotations "eks.amazonaws.com/role-arn" }}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carts
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carts
+  template:
+    metadata:
+      labels:
+        app: carts
+    spec:
+      serviceAccountName: carts
+      containers:
+      - name: carts
+        image: public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.1
+        ports:
+        - containerPort: 8080
+        env:
+        {{- with .Values.carts.env }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carts
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: carts

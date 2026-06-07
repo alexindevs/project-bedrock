@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-secrets-sa
+  namespace: retail-app
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::927656030834:role/project-bedrock-eso-role"

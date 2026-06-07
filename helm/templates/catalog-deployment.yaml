@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.1
+        ports:
+        - containerPort: 8080
+        env:
+        {{- with .Values.catalog.env }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: RETAIL_CATALOG_PERSISTENCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: catalog-db
+              key: username
+        - name: RETAIL_CATALOG_PERSISTENCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: catalog-db
+              key: password
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: catalog

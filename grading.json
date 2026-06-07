@@ -1,0 +1,57 @@
+{
+  "assets_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "bedrock-assets-alt-soe-025-5437"
+  },
+  "carts_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::927656030834:role/project-bedrock-carts-role"
+  },
+  "cluster_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://2B0511BF1CF7017D42440B489A30A71B.gr7.us-east-1.eks.amazonaws.com"
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-cluster"
+  },
+  "eso_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::927656030834:role/project-bedrock-eso-role"
+  },
+  "github_actions_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::927656030834:role/bedrock-github-actions"
+  },
+  "lb_controller_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::927656030834:role/project-bedrock-lb-controller-role"
+  },
+  "mysql_address": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-catalog.c810uy8ocbmj.us-east-1.rds.amazonaws.com"
+  },
+  "postgres_address": {
+    "sensitive": false,
+    "type": "string",
+    "value": "project-bedrock-orders.c810uy8ocbmj.us-east-1.rds.amazonaws.com"
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-02c86952b77b83e4e"
+  }
+}

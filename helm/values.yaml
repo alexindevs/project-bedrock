@@ -1,0 +1,35 @@
+catalog:
+  mysql:
+    create: false
+  env:
+    - name: RETAIL_CATALOG_PERSISTENCE_PROVIDER
+      value: "mysql"
+    - name: RETAIL_CATALOG_PERSISTENCE_ENDPOINT
+      value: "project-bedrock-catalog.c810uy8ocbmj.us-east-1.rds.amazonaws.com:3306"
+    - name: RETAIL_CATALOG_PERSISTENCE_DB_NAME
+      value: "catalog"
+
+orders:
+  postgresql:
+    create: false
+  env:
+    - name: RETAIL_ORDERS_PERSISTENCE_PROVIDER
+      value: "postgres"
+    - name: RETAIL_ORDERS_PERSISTENCE_ENDPOINT
+      value: "project-bedrock-orders.c810uy8ocbmj.us-east-1.rds.amazonaws.com:5432"
+    - name: RETAIL_ORDERS_PERSISTENCE_NAME
+      value: "orders"
+
+carts:
+  dynamodb:
+    create: false
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::927656030834:role/project-bedrock-carts-role"
+  env:
+    - name: RETAIL_CART_PERSISTENCE_PROVIDER
+      value: "dynamodb"
+    - name: RETAIL_CART_PERSISTENCE_DYNAMODB_TABLE_NAME
+      value: "project-bedrock-carts"
+    - name: RETAIL_CART_PERSISTENCE_DYNAMODB_CREATE_TABLE
+      value: "false"

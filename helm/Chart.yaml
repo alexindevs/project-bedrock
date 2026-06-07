@@ -1,0 +1,16 @@
+apiVersion: v2
+name: retail-store
+description: AWS Retail Store Sample App with managed data layer (RDS, DynamoDB)
+type: application
+version: 0.8.5
+appVersion: "0.8.5"
+home: https://github.com/aws-containers/retail-store-sample-app
+sources:
+  - https://github.com/aws-containers/retail-store-sample-app
+keywords:
+  - retail
+  - eks
+  - rds
+  - dynamodb
+maintainers:
+  - name: Project Bedrock

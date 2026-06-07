@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: retail-store-config
+  namespace: {{ .Release.Namespace }}
+data:
+  CATALOG_ENDPOINT: "{{ .Values.catalog.mysql.endpoint }}"
+  ORDERS_ENDPOINT: "{{ .Values.orders.postgresql.endpoint }}"
+  CARTS_TABLE: "{{ .Values.carts.dynamodb.tableName }}"
